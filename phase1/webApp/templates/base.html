@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
     <meta charset="UTF-8">
-    <title>AiStore</title>
+    <title>Cat Farm</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic&family=Noto+Sans+KR:wght@300&display=swap" rel="stylesheet">
@@ -30,7 +31,7 @@
     <header>
       <nav class="navbar navbar-expand-lg navbar-light bg-light rounded border-bottom fixed-top">
         <div class="container-fluid">
-          <a class="navbar-brand" href="{{url_for('index')}}">Converea</a>
+          <a class="navbar-brand" href="{{url_for('index')}}">Cat Farm</a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
@@ -55,13 +56,12 @@
     </header>
 
     <div class="container">
-
         {% block content %}{% endblock %}
     </div>
 
     <footer class="text-center">
         {% block footer %}
-            <small> &copy; NugunaAiot / <a title="Written by traveler4d">email: tarveler4d@gmail.com</a>
+            <small> &copy; FarmBoys / <a title="Written by traveler4d">https://github.com/SESAC-AIoT</a>
             </small>
         {% endblock %}
     </footer>

@@ -1,9 +1,15 @@
 {% extends 'base.html' %}
+<!--<head>{{ turbo() }}</head> -->
 
 {% block content %}
 
+<div id= "load">
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
         <h1 class="h2">Dashboard</h1>
+
+    <!--    <h5 style="color:red;"> Data Refresh {{ interval }} sec </h5> -->
+
+    <!--    <meta http-equiv="refresh" content="1">  웹페이지 갱신 -->
         <div class="btn-toolbar mb-2 mb-md-0">
             <div class="btn-group me-2">
                 <a type="button" class="btn btn-sm btn-outline-secondary" href="{{url_for('board', type = 'temp')}}">온도</a>
@@ -89,7 +95,7 @@
         {% endfor %}
         </tbody>
     </table>
-
+</div>
 {% endblock %}
 
 
