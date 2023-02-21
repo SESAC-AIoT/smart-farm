@@ -1,73 +1,14 @@
-from flask import Flask, request, render_template, redirect, url_for, session, Response
+from flask import Flask, request, render_template, redirect, url_for, session
+import sys
 from database import *
 import numpy as np
-import argparse, io, os, sys, datetime, cv2, torch
-from PIL import Image
-from time import sleep
+import datetime
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'aiot'
 
+app.config['SECRET_KEY'] = 'aiot'
 collection = 'converea'  # device
 DID = '0.2v' # 'd000001'
-
-
-# (추가처리) 객체탐지를 위한 모델로드
-model = torch.hub.load("ultralytics/yolov5", "yolov5s", pretrained=True, force_reload=True)
-model.eval()
-model.conf = 0.6
-model.iou = 0.45
-
-# (추가처리) 객체탐지를 위한 함수생성
-def gen():
-    cap=cv2.VideoCapture(0)
-    while(cap.isOpened()):
-        success, frame = cap.read()
-        if success == True:
-            ret,buffer=cv2.imencode('.jpg',frame)
-            frame=buffer.tobytes()
-            img = Image.open(io.BytesIO(frame))
-            results = model(img, size=640)
-            update_detect(results)
-            img = np.squeeze(results.render()) #RGB
-            img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR) #BGR
-        else:
-            break
-
-        frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
-        yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
-
-# (추가처리) 객체탐지 및 DB연동을 위한 함수생성
-def update_detect(result):
-    if 'Cats' in str(result):
-        #print(str(result)[19:26])
-        result_text = str(result)[19:26]
-        detect_data = {'update_time': 'test', 'result': 'test'}
-        detect_data['update_time'] = datetime.datetime.now().strftime("%Y.%m.%d %H:%M:%S")
-        detect_data['result'] =  result_text
-        doc_ref = db.collection('device').document("d09")
-        doc = doc_ref.get()
-        doc_ref.update({ 'detect': firestore.ArrayUnion([detect_data])})
-
-# (추가처리) 객체탐지 웹앱 내 웹캠 생성
-@app.route("/cat", methods=['POST', 'GET'])
-def cat():
-    device = db.collection('device').document("d09").get()
-    session['d'] = device.to_dict()
-    device = session['d']
-    all_list = device['detect']
-    all_list.reverse()
-    results = [all for all in all_list]
-    return render_template('cat.html', times=results)
-
-
-
-
-
-
-
-
-
 
 @app.before_request
 def before_request():
@@ -178,8 +119,4 @@ def get_chart(device, type):
         return [sensor['turbidity'] for sensor in sensors]
 
 if __name__ == '__main__':
-    #(변경처리) 추가웹앱 적용을 위한 메인소스 수정
-    parser = argparse.ArgumentParser(description="Flask app exposing yolov5 models")
-    parser.add_argument("--port", default=5000, type=int, help="port number")
-    args = parser.parse_args()
-    app.run('0.0.0.0',port=args.port, debug=True) # port 9999
+    app.run('0.0.0.0', 9999, debug=True)

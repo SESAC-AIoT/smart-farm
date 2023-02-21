@@ -1,16 +1,27 @@
-from flask import Flask, request, render_template, redirect, url_for, session, Response
+from flask import Flask, request, render_template, redirect, url_for, session
+import sys
 from database import *
 import numpy as np
-import argparse, io, os, sys, datetime, cv2, torch
+import datetime
+
+
+# (추가처리) 라이브러리
+from flask import Response
+import argparse
+import io
+import os
 from PIL import Image
+import cv2
+import numpy as np
+import torch
 from time import sleep
 
+
 app = Flask(__name__)
+
 app.config['SECRET_KEY'] = 'aiot'
-
-collection = 'converea'  # device
-DID = '0.2v' # 'd000001'
-
+# (변경처리) 데이터베이스명
+DID = 'd08'
 
 # (추가처리) 객체탐지를 위한 모델로드
 model = torch.hub.load("ultralytics/yolov5", "yolov5s", pretrained=True, force_reload=True)
@@ -31,6 +42,7 @@ def gen():
             update_detect(results)
             img = np.squeeze(results.render()) #RGB
             img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR) #BGR
+
         else:
             break
 
@@ -49,24 +61,13 @@ def update_detect(result):
         doc = doc_ref.get()
         doc_ref.update({ 'detect': firestore.ArrayUnion([detect_data])})
 
-# (추가처리) 객체탐지 웹앱 내 웹캠 생성
-@app.route("/cat", methods=['POST', 'GET'])
-def cat():
-    device = db.collection('device').document("d09").get()
-    session['d'] = device.to_dict()
-    device = session['d']
-    all_list = device['detect']
-    all_list.reverse()
-    results = [all for all in all_list]
-    return render_template('cat.html', times=results)
 
 
 
+app = Flask(__name__)
 
-
-
-
-
+app.config['SECRET_KEY'] = 'aiot'
+DID = 'd08'
 
 
 @app.before_request
@@ -77,22 +78,21 @@ def before_request():
 
 @app.route("/", methods=['POST', 'GET'])
 def index():
-    return render_template('index.html')
+    return render_template('index_back.html')
 
 @app.route("/monitor/", methods=['POST', 'GET'])
 def monitor():
     if 'd' not in session:
-        session['d'] = get_device(collection, DID)
+        session['d'] = get_device(DID)
     device = session['d']
-    print(device['sensor'][-1]) # 가장 마지막(최근) 데이터
     m = get_monitor(device['sensor'][-1])
-    g = get_growth((device['model'][-1]))
+    g = get_growth(device['growth'])
     return render_template('monitor.html', m = m, growth = g)
 
 @app.route("/board/<type>", methods=['POST', 'GET'])
 def board(type = 'temp'):
     if 'd' not in session:
-        session['d'] = get_device(collection, DID)
+        session['d'] = get_device(DID)
     device = session['d']
     sensors, times = get_board(device)
     values = get_chart(device, type)
@@ -104,19 +104,39 @@ def register():
     return render_template('sregister.html')
 
 
+
+
+# (추가처리) 객체탐지 웹앱 생성
+@app.route("/cat", methods=['POST', 'GET'])
+def cat():
+    device = db.collection('device').document("d09").get()
+    session['d'] = device.to_dict()
+    device = session['d']
+    all_list =device['detect']
+    all_list.reverse()
+    results = [all for all in all_list]
+    return render_template('cat.html', times = results)
+
+# (추가처리) 객체탐지 웹앱 내 웹캠 생성
+@app.route('/cat_webcam')
+def cat_webcam():
+    return Response(gen(),
+                        mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
 @app.teardown_request
 def shutdown_session(exception=None):
     pass
 
 def get_growth(growth):
-    if growth['growth_level'] == '0':
-        return '0주차 씨앗'
-    elif growth['growth_level'] == '1':
-        return '1주차 새싹'
-    elif growth['growth_level'] == '2':
-        return '2주차 성장'
-    elif growth['growth_level'] == '3':
-        return '3주차 성숙'
+    if growth == 0:
+        return '씨앗'
+    elif growth == 1:
+        return '새싹'
+    elif growth == 2:
+        return '성장'
+    elif growth == 3:
+        return '성숙'
 
 def get_monitor(sensor):
     if sensor['water_level'] == 0:
@@ -132,6 +152,7 @@ def get_monitor(sensor):
     else:
         fan = '비회전'
     return {
+        # (변경처리) 데이터베이스 내 컬럼명 변경
         'temp' : '{}℃'.format(sensor['temp']),
         'humidity' : '{}%'.format(sensor['humidity']),
         'water_level' : '{}'.format(water_level),
@@ -144,8 +165,8 @@ def get_board(device):
     cnt = len(device['sensor'])
     if cnt >20:
         cnt = 20
-        sensors = device['sensor'][-20:] # 최근 20개
-        sensors.reverse() # 최근 순으로 정렬
+        sensors = device['sensor'][-20:]
+        sensors.reverse()
         timeline = [sensor['update_time'] for sensor in sensors][-20:]
 
     else:
@@ -153,10 +174,11 @@ def get_board(device):
         sensors.reverse()
         timeline = [sensor['update_time'] for sensor in sensors]
 
-    #print(sensors)
+    print(sensors)
     msensors = [get_monitor(sensor) for sensor in sensors]
 
     return msensors, timeline
+
 
 def get_chart(device, type):
     cnt = len(device['sensor'])
@@ -168,8 +190,11 @@ def get_chart(device, type):
         sensors = device['sensor']
         sensors.reverse()
 
+
     if type == 'temp':
+        # (변경처리) 데이터베이스 내 칼럼명 변경
         return [sensor['temp'] for sensor in sensors]
+        return [sensor['temperature'] for sensor in sensors]
     elif type == 'humidity':
         return [sensor['humidity'] for sensor in sensors]
     elif type == 'ph':
@@ -177,9 +202,12 @@ def get_chart(device, type):
     elif type == 'turbidity':
         return [sensor['turbidity'] for sensor in sensors]
 
+
+
 if __name__ == '__main__':
     #(변경처리) 추가웹앱 적용을 위한 메인소스 수정
     parser = argparse.ArgumentParser(description="Flask app exposing yolov5 models")
     parser.add_argument("--port", default=5000, type=int, help="port number")
     args = parser.parse_args()
-    app.run('0.0.0.0',port=args.port, debug=True) # port 9999
+    app.run('0.0.0.0',port=args.port, debug=True)
+    app.run('0.0.0.0',9999, debug=True)
