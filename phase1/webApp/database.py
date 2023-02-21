@@ -10,7 +10,8 @@ app = firebase_admin.initialize_app(cred)
 
 db = firestore.client()
 
-collection = 'converea'
+collection = 'converea'  # device
+d_id = '0.3v'
 
 def get_device(collection, d_id):
     device = db.collection(collection).document(d_id).get()
@@ -24,6 +25,10 @@ def create_device(d_id):
             'id': d_id,
             'is_running': False,
             'manufacture_date': datetime.now(),
-            'detect': []
+            'detect': [],
+            'model': [],
+            'sensor':[]
+
         }}
         doc_ref.set(device)
+

@@ -1,18 +1,31 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
+<!--<head>-->
+<!--    <meta http-equiv="refresh" content="0.5">-->
+<!--</head>-->
     <div class="py-3 text-center">
-      <h2>나의 고양이들 상황 모니터링</h2>
-      <p class="lead">나를 찾아주세요.</p>
+      <h2>고양이 탐지 대시보드</h2>
+      <p class="lead">냠냠</p>
     </div>
-<!--
-    <div class="video-container">
-        <img src="{{ url_for('cat_webcam') }}" class="center">
-    </div>
--->
 
-    <h3>History</h3>
+    <div class="video-container">
+        <img src="{{ url_for('webcam') }}" class="center">
+    </div>
+
+
+    <table>
+    <tr>
+        <td>WebCam<br>before detect </td>
+        <td>Detect<br>after detect</td>
+    </tr>
+    <tr>
+        <td><canvas id="canvas" width="416" height="416" style="background-color: grey"></canvas></td>
+        <td><img id="image" src="" width="416" height="416" style="background-color: grey"></td>
+    </tr>
+    </table>
+
+    <h3>Detect History</h3>
     <table class="table">
         <thead>
             <tr>
