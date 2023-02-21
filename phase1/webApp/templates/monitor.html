@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
+<head>
+    <meta http-equiv="refresh" content="20"> <!--sec-->
+</head>
+
 <svg xmlns="http://www.w3.org/2000/svg" style="display: none;">
   <symbol id="temp" viewBox="0 0 24 24">
     <path fill="currentColor" d="M15 13V5A3 3 0 0 0 9 5V13A5 5 0 1 0 15 13M12 4A1 1 0 0 1 13 5V8H11V5A1 1 0 0 1 12 4Z" />
@@ -30,6 +34,7 @@
 
 <div class="container px-3 py-5" id="icon-grid">
     <h2 class="pb-2 border-bottom">Converea State</h2>
+    <h6 style="color:red; display: inline-block; margin: 0 5px;  float: right;" > Refresh interval 20 sec </h6>
     <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-3 g-4 py-5">
       <div class="col d-flex align-items-start">
         <svg class="bi text-muted flex-shrink-0 me-3" width="1.75em" height="1.75em"><use xlink:href="#temp"/></svg>
@@ -78,8 +83,8 @@
 
 <div class="row featurette">
   <div class="col-md-7 order-md-2">
-    <h2 class="featurette-heading">식물 성장단계 <span class="text-muted"> {{ growth }} 단계</span></h2>
-    <p class="lead">현재 작물의 성장 단계는 {{ growth }} 단계 입니다.</p>
+    <h2 class="featurette-heading">식물 성장 단계 <span style="color:red;"><strong>{{ growth }} </strong> </span></h2>
+    <p class="lead">성장 예측 모델 데이터 갱신 인터벌은 60초 입니다.</p>
   </div>
   <div class="col-md-5 order-md-1">
     <img src="{{ url_for('static', filename='growth.jpg') }}" height="400" class="d-block w-100" alt="...">

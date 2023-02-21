@@ -5,9 +5,7 @@ from datetime import datetime
 
 # Use a service account.
 cred = credentials.Certificate('../../secret/nugunaaiot-maeng-1004a11a5af7.json')
-
 app = firebase_admin.initialize_app(cred)
-
 db = firestore.client()
 
 collection = 'converea'  # device
@@ -21,7 +19,7 @@ def get_device(collection, d_id):
 def create_device(d_id):
     doc_ref = db.collection(collection).document(d_id)
     if not doc_ref.get().exists:
-        device = {d_id: {
+        doc_ref.set({
             'id': d_id,
             'is_running': False,
             'manufacture_date': datetime.now(),
@@ -29,6 +27,4 @@ def create_device(d_id):
             'model': [],
             'sensor':[]
 
-        }}
-        doc_ref.set(device)
-
+        })
