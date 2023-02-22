@@ -1,10 +1,8 @@
-from flask import Flask, request, make_response, render_template, redirect, url_for, session, Response
+from flask import Flask, render_template, session, Response
 from database import *
 import numpy as np
-import argparse, io, os, sys, datetime, cv2, torch
-# os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+import io, datetime, cv2, torch
 from PIL import Image
-from time import sleep
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'aiot'
@@ -137,19 +135,19 @@ model = torch.hub.load('ultralytics/yolov5', model='custom', path =path) # cuda�
 
 # 객체탐지를 위한 함수생성
 def gen_frame():
-    cam = cv2.VideoCapture(0)
+    cam = cv2.VideoCapture(0, cv2.CAP_DSHOW) # 웹캠 opencv 로딩 속도 개선 cap_dshow 다이렉트쇼,
     while(cam.isOpened()):
         success, frame = cam.read()
         if success == True:
-            ret,buffer=cv2.imencode('.jpg',frame)
-            frame=buffer.tobytes()
+            ret, buffer = cv2.imencode('.jpg',frame)
+            frame  = buffer.tobytes()
+            # yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
             img = Image.open(io.BytesIO(frame))
-
             results = model(img, size=640)
             upload_detect(str(results))
-
             img = np.squeeze(results.render()) #RGB
             img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR) #BGR
+
         else:
             break
 
@@ -188,9 +186,12 @@ def webcam():
 
 
 
+
+
+
 if __name__ == '__main__':
     # 추가웹앱 적용을 위한 메인소스 수정
     # parser = argparse.ArgumentParser(description="Flask app exposing yolov5 models")
     # parser.add_argument("--port", default=5000, type=int, help="port number")
     # args = parser.parse_args() # args.port
-    app.run('0.0.0.0',port=9999, debug=True, use_reloader=False) # port 9999
+    app.run('0.0.0.0', debug=True, use_reloader=False) # port 9999
