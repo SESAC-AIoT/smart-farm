@@ -17,7 +17,8 @@ def create_device(collection, d_id):
     doc_ref = db.collection(collection).document(d_id)
     if not doc_ref.get().exists:
         doc_ref.set({
-            'id': d_id,
+            'upload_date': d_id,#  datetime.now()
+            'upload_num': 0,
             'is_running': False,
             'manufacture_date': datetime.now(),
             'detect': [],
