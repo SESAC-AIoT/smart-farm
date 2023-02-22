@@ -38,7 +38,7 @@ def gen_run(d_id, upload_num):
     }
     model = {
         'update_time': datetime.now().strftime("%Y.%m.%d %H:%M:%S"),
-        'growth_level': random.choice(['1', '2', '3', '4'])
+        'growth_level': random.choice(['0', '1', '2', '3'])
     }
     print(sensor)
     print(detect)
@@ -55,17 +55,14 @@ def did_gen(d_id) :
 
     # 전송 횟수와 오늘 날짜 비교
     if last_num >= upload_limit and last_did == d_id: # 오늘날짜, 전송횟수 초과
-        print('gg')
         d_id = (datetime.now() + day1).strftime("%Y.%m.%d") # 다음날로 변경
         upload_num = 0
         return d_id, upload_num
 
     elif last_num < upload_limit and last_did == d_id: # 오늘 날짜, 전송횟수 남음
-        print('4')
         return last_did, last_num
 
     else : # 날짜가 매칭되지 않을 경우
-        print('5')
         upload_num = 0
         return d_id, upload_num
     print('6')

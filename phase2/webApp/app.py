@@ -1,7 +1,8 @@
 from flask import Flask, render_template,session, Response
 from database import *
 import numpy as np
-import io, datetime, cv2, torch
+from datetime import datetime, timedelta
+import io, cv2, torch
 from PIL import Image
 
 app = Flask(__name__)
@@ -10,7 +11,7 @@ app.config['SECRET_KEY'] = 'aiot'
 @app.before_request
 def before_request():
     session.permanent = True
-    app.permanent_session_lifetime = datetime.timedelta(minutes=5)
+    app.permanent_session_lifetime = timedelta(minutes=5)
     session.modified = True
 
 @app.route("/", methods=['POST', 'GET'])
@@ -37,11 +38,12 @@ def monitor():
     return render_template('monitor.html', m = m, growth = g)
 
 @app.route("/board/<type>", methods=['POST', 'GET'])
-def board(type = 'tp'):
+def board(type):
     # 화면 리프레시 할 때 데이터 새로 고침을 위해 세션 미사용
     device = get_device(collection, d_id)
     sensors, times = get_board(device)
     values = get_chart(device, type)
+    print(values)
     return render_template('board.html', sensors = sensors , times = times, values = values)
 
 def get_growth(growth):
@@ -68,11 +70,11 @@ def get_monitor(sensor):
     else:
         fan = '비회전'
     return {
-        'temp' : '{}℃'.format(round(sensor['tp'],1)),
-        'humidity' : '{}%'.format(round(sensor['hd'],1)),
-        'water_level' : '{}'.format(water_level),
+        'tp' : '{}℃'.format(round(sensor['tp'],1)),
+        'hd' : '{}%'.format(round(sensor['hd'],1)),
+        'wl' : '{}'.format(water_level),
         'ph' : '{}pH'.format(round(sensor['ph'],1)),
-        'turbidity' : '{:.2f}ntu'.format(round(turbidity,1)),
+        'tb' : '{:.2f}ntu'.format(round(turbidity,1)),
         'fan' : '{}중'.format(fan),
     }
 
@@ -102,13 +104,13 @@ def get_chart(device, type):
         sensors.reverse()
 
     if type == 'tp':
-        return [round(sensor['tp'],1) for sensor in sensors]
+        return [sensor['tp'] for sensor in sensors]
     elif type == 'hd':
-        return [round(sensor['hd'],1) for sensor in sensors]
+        return [sensor['hd'] for sensor in sensors]
     elif type == 'ph':
-        return [round(sensor['ph'],1) for sensor in sensors]
-    elif type == 'td':
-        return [round(sensor['td'],1) for sensor in sensors]
+        return [sensor['ph'] for sensor in sensors]
+    elif type == 'tb':
+        return [sensor['tb'] for sensor in sensors]
 
 
 
@@ -171,8 +173,8 @@ def webcam():
 if __name__ == '__main__':
 
     # 데이터 베이스 연동
-    collection = 'converea'  # device
-    d_id = '0.4v'
+    collection = 'catFarm'  # device
+    d_id = datetime.now().strftime("%Y.%m.%d")
     create_device(collection, d_id)
 
     # 객체탐지 모델 로드
