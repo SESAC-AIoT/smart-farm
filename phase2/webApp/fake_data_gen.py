@@ -14,7 +14,6 @@ d_id = '0.4v'
 interval = 20  # sec
 sensors = []
 
-
 def create_device(d_id):
     # 도큐먼트 스넵샷에서 (get함수의 결과) .exists 필드로 id 유무 확인 가능
     doc_ref = db.collection(collection).document(d_id)
@@ -41,19 +40,16 @@ def upload_data(d_id, sensor, detect, model):
     })
 
 
-
-create_device(d_id)
-
 while True:
     try:
         sensor = {
             'update_time' : datetime.now().strftime("%Y.%m.%d %H:%M:%S"),
             'fan' : str(random.choice([1,1,1,0,0])),
             'wl' : str(random.choice([1, 0, 1, 1, 0])),  # 수위 센서, 5개중 하나 선택
-            'ph' : uniform(5, 8),  # ph센서
-            'tb' : uniform(4, 8),  # 탁도 센서
-            'tp' : randint(15, 30),  # 온도 센서
-            'hd' : uniform(40, 70)  # 습도 센서
+            'ph' : round(uniform(5, 8),1),  # ph센서
+            'tb' : round(uniform(4, 8),1),  # 탁도 센서
+            'tp' : round(uniform(15, 30),1),  # 온도 센서
+            'hd' : round(uniform(40, 70),1)  # 습도 센서
         }
         detect = {
             'update_time': datetime.now().strftime("%Y.%m.%d %H:%M:%S"),
@@ -77,3 +73,8 @@ while True:
     except KeyboardInterrupt:
         print('중지됨')
         break
+
+
+
+#### 실행 ####
+create_device(d_id)

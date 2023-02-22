@@ -4,86 +4,43 @@
 <!--<head>-->
 <!--    <meta http-equiv="refresh" content="0.5">-->
 <!--</head>-->
-    <div class="py-3 text-center">
-      <h2>고양이 탐지 대시보드</h2>
-      <p class="lead">냠냠</p>
-    </div>
+<div class="py-3 text-center">
+  <h2>고양이 탐지 대시보드</h2>
+  <p class="lead">냠냠</p>
+</div>
 
-    <div class="video-container">
-        <img src="{{ url_for('webcam') }}" class="center">
-    </div>
-<script>
-    var video = document.getElementById('video');
-    var canvas = document.getElementById('canvas');
-    var context = canvas.getContext('2d');
-    var image = document.getElementById('image');
-    // Get access to the camera!
-    if(navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        navigator.mediaDevices.getUserMedia({ video: true }).then(function(stream) {
-            video.srcObject = stream;
-            video.play();
-            window.setInterval(function() {
-                context.drawImage(video, 0, 0, 416, 416); // better use size because camera may gives data in different size then <video> is displaying
-                canvas.toBlob(upload, "image/jpeg");
-            }, 100);
-        });
-    }
+<div class="video-container">
+    <img src="{{ url_for('webcam') }}" class="center">
+</div>
 
-    function upload(file) {
-        var formdata =  new FormData();
-        formdata.append("snap", file);
+<table>
+<tr>
+    <td>WebCam<br>before detect </td>
+    <td>Detect<br>after detect</td>
+</tr>
+<tr>
+    <td><canvas id="canvas" width="416" height="416" style="background-color: grey"></canvas></td>
+    <td><img id="image" src="" width="416" height="416" style="background-color: grey"></td>
+</tr>
+</table>
 
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "{{ url_for('upload') }}", true);
-        xhr.responseType = 'blob';
-        xhr.onload = function() {
+<h3>Detect History</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">탐지 시간</th>
+            <th scope="col">탐지 결과</th>
+        </tr>
+    </thead>
+    <tbody>
+    {% for t in times %}
+        <tr>
+            <td>{{ t.update_time }}</td>
+            <td>{{ t.result }}</td>
 
-            if(this.status = 200) {
-                //console.log(this.response);
-            } else {
-                console.error(xhr);
-            }
-
-            image.src = URL.createObjectURL(this.response); // blob
-        };
-        // send form in AJAX
-        xhr.send(formdata);
-        //image.src = URL.createObjectURL(file);
-    }
-
-</script>
-
-
-
-
-    <table>
-    <tr>
-        <td>WebCam<br>before detect </td>
-        <td>Detect<br>after detect</td>
-    </tr>
-    <tr>
-        <td><canvas id="canvas" width="416" height="416" style="background-color: grey"></canvas></td>
-        <td><img id="image" src="" width="416" height="416" style="background-color: grey"></td>
-    </tr>
-    </table>
-
-    <h3>Detect History</h3>
-    <table class="table">
-        <thead>
-            <tr>
-                <th scope="col">탐지시간</th>
-                <th scope="col">탐지결과</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for t in times %}
-            <tr>
-                <td>{{ t.update_time }}</td>
-                <td>{{ t.result }}</td>
-
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
 
 {% endblock %}

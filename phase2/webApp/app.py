@@ -1,15 +1,11 @@
-from flask import Flask, request, make_response, render_template, redirect, url_for, session, Response
+from flask import Flask, render_template,session, Response
 from database import *
 import numpy as np
-import argparse, io, os, sys, datetime, cv2, torch
-# os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+import io, datetime, cv2, torch
 from PIL import Image
-from time import sleep
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'aiot'
-
-create_device(d_id)
 
 @app.before_request
 def before_request():
@@ -33,9 +29,6 @@ def shutdown_session(exception=None):
 
 @app.route("/monitor/", methods=['POST', 'GET'])
 def monitor():
-    # if 'd' not in session:
-    #     session['d'] = get_device(collection, d_id)
-    # device = session['d']
     # 화면 리프레시 할 때 데이터 새로 고침을 위해 세션 미사용
     device = get_device(collection, d_id)
     print(device['sensor'][-1]) # 가장 마지막(최근) 데이터
@@ -44,10 +37,7 @@ def monitor():
     return render_template('monitor.html', m = m, growth = g)
 
 @app.route("/board/<type>", methods=['POST', 'GET'])
-def board(type = 'temp'):
-    # if 'd' not in session:
-    #     session['d'] = get_device(collection, d_id)
-    # device = session['d']
+def board(type = 'tp'):
     # 화면 리프레시 할 때 데이터 새로 고침을 위해 세션 미사용
     device = get_device(collection, d_id)
     sensors, times = get_board(device)
@@ -65,24 +55,24 @@ def get_growth(growth):
         return '3주차 성숙'
 
 def get_monitor(sensor):
-    if sensor['water_level'] == 0:
+    if sensor['wl'] == 0:
         water_level = '부족상태'
     else:
         water_level = '유지상태'
-    turbidity = -1120.4 * np.square(sensor['turbidity']) + 5742.3 * sensor['turbidity'] - 4352.9
+    turbidity = -1120.4 * np.square(sensor['tb']) + 5742.3 * sensor['tb'] - 4352.9
     if 'fan' in sensor:
-        if sensor['fan'] == 'on':
+        if sensor['fan'] == 1 :
             fan = '회전'
         else:
             fan = '비회전'
     else:
         fan = '비회전'
     return {
-        'temp' : '{}℃'.format(sensor['temp']),
-        'humidity' : '{}%'.format(sensor['humidity']),
+        'temp' : '{}℃'.format(round(sensor['tp'],1)),
+        'humidity' : '{}%'.format(round(sensor['hd'],1)),
         'water_level' : '{}'.format(water_level),
-        'ph' : '{}pH'.format(sensor['ph']),
-        'turbidity' : '{:.2f}ntu'.format(turbidity),
+        'ph' : '{}pH'.format(round(sensor['ph'],1)),
+        'turbidity' : '{:.2f}ntu'.format(round(turbidity,1)),
         'fan' : '{}중'.format(fan),
     }
 
@@ -90,10 +80,8 @@ def get_monitor(sensor):
 def get_board(device):
     cnt = len(device['sensor'])
     if cnt >20:
-        cnt = 20
         sensors = device['sensor'][-20:] # 최근 20개
         timeline = [sensor['update_time'] for sensor in sensors]
-
     else:
         sensors = device['sensor']
         timeline = [sensor['update_time'] for sensor in sensors]
@@ -113,14 +101,14 @@ def get_chart(device, type):
         sensors = device['sensor']
         sensors.reverse()
 
-    if type == 'temp':
-        return [sensor['temp'] for sensor in sensors]
-    elif type == 'humidity':
-        return [sensor['humidity'] for sensor in sensors]
+    if type == 'tp':
+        return [round(sensor['tp'],1) for sensor in sensors]
+    elif type == 'hd':
+        return [round(sensor['hd'],1) for sensor in sensors]
     elif type == 'ph':
-        return [sensor['ph'] for sensor in sensors]
-    elif type == 'turbidity':
-        return [sensor['turbidity'] for sensor in sensors]
+        return [round(sensor['ph'],1) for sensor in sensors]
+    elif type == 'td':
+        return [round(sensor['td'],1) for sensor in sensors]
 
 
 
@@ -128,16 +116,9 @@ def get_chart(device, type):
 
 ############### 웹캠 객체탐지 페이지 #################
 
-# 객체탐지를 위한 모델로드
-path='../../secret/model/yolov5/models/yolov5s.pt'
-model = torch.hub.load('ultralytics/yolov5', model='custom', path =path) # cuda를 backend에서 자동으로 잡음
-# model.eval()
-# model.conf = 0.6
-# model.iou = 0.45
-
 # 객체탐지를 위한 함수생성
 def gen_frame():
-    cam = cv2.VideoCapture(0)
+    cam = cv2.VideoCapture(0, cv2.CAP_DSHOW) # 웹캠 opencv 로딩 속도 개선 cap_dshow 다이렉트쇼
     while(cam.isOpened()):
         success, frame = cam.read()
         if success == True:
@@ -186,11 +167,17 @@ def webcam():
                     mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
-
-
+########################     실행     ########################
 if __name__ == '__main__':
-    # 추가웹앱 적용을 위한 메인소스 수정
-    # parser = argparse.ArgumentParser(description="Flask app exposing yolov5 models")
-    # parser.add_argument("--port", default=5000, type=int, help="port number")
-    # args = parser.parse_args() # args.port
-    app.run('0.0.0.0',port=9999, debug=True, use_reloader=False) # port 9999
+
+    # 데이터 베이스 연동
+    collection = 'converea'  # device
+    d_id = '0.4v'
+    create_device(collection, d_id)
+
+    # 객체탐지 모델 로드
+    model_path = '../../secret/model/yolov5/models/yolov5s.pt'
+    model = torch.hub.load('ultralytics/yolov5', model='custom', path=model_path)  # backend에서 cuda 자동 설정
+
+    # 웹앱 실행
+    app.run('0.0.0.0', debug=True, use_reloader=False)
