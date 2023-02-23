@@ -64,6 +64,7 @@ def did_gen(d_id) :
 
     else : # 날짜가 매칭되지 않을 경우
         upload_num = 0
+        d_id = datetime.now().strftime("%Y.%m.%d")
         return d_id, upload_num
     print('6')
     return last_did, last_num
