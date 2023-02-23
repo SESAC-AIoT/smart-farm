@@ -2,18 +2,17 @@
 
 {% block content %}
 
-<!--<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cpu-fill" viewBox="0 0 16 16">-->
-<!--  <symbol id="realtime" viewBox="0 0 24 24">-->
-<!--  <path d="M6.5 6a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z"/>-->
-<!--  <path d="M5.5.5a.5.5 0 0 0-1 0V2A2.5 2.5 0 0 0 2 4.5H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2A2.5 2.5 0 0 0 4.5 14v1.5a.5.5 0 0 0 1 0V14h1v1.5a.5.5 0 0 0 1 0V14h1v1.5a.5.5 0 0 0 1 0V14h1v1.5a.5.5 0 0 0 1 0V14a2.5 2.5 0 0 0 2.5-2.5h1.5a.5.5 0 0 0 0-1H14v-1h1.5a.5.5 0 0 0 0-1H14v-1h1.5a.5.5 0 0 0 0-1H14v-1h1.5a.5.5 0 0 0 0-1H14A2.5 2.5 0 0 0 11.5 2V.5a.5.5 0 0 0-1 0V2h-1V.5a.5.5 0 0 0-1 0V2h-1V.5a.5.5 0 0 0-1 0V2h-1V.5zm1 4.5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3A1.5 1.5 0 0 1 6.5 5z"/>-->
-
-<!--  </symbol>-->
-
+<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cpu-fill" viewBox="0 0 16 16">
+<symbol id="realtime" viewBox="0 0 24 24">
+    <path d="M6.5 6a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z"/>
+    <path d="M5.5.5a.5.5 0 0 0-1 0V2A2.5 2.5 0 0 0 2 4.5H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2A2.5 2.5 0 0 0 4.5 14v1.5a.5.5 0 0 0 1 0V14h1v1.5a.5.5 0 0 0 1 0V14h1v1.5a.5.5 0 0 0 1 0V14h1v1.5a.5.5 0 0 0 1 0V14a2.5 2.5 0 0 0 2.5-2.5h1.5a.5.5 0 0 0 0-1H14v-1h1.5a.5.5 0 0 0 0-1H14v-1h1.5a.5.5 0 0 0 0-1H14v-1h1.5a.5.5 0 0 0 0-1H14A2.5 2.5 0 0 0 11.5 2V.5a.5.5 0 0 0-1 0V2h-1V.5a.5.5 0 0 0-1 0V2h-1V.5a.5.5 0 0 0-1 0V2h-1V.5zm1 4.5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3A1.5 1.5 0 0 1 6.5 5z"/>
+</symbol>
+</svg>
 
 <div class="py-3 text-center">
     <h2>고양이 탐지 대시보드</h2>
     <h>
-<!--         <svg class="image" width="1.75em" height="1.75em"><use xlink:href="#realtime"/></svg>-->
+         <svg class="image" width="1.75em" height="1.75em"><use xlink:href="#realtime"/></svg>
         <strong>사용자파일 탐지 결과</strong>
     </h>
 </div>
@@ -32,23 +31,22 @@
 
     {% if image is not none %}
     <div class="row justify-content-center">
-        <img class="col-6 m-4" id="image" src="data:image/jpeg;base64,{{ image }}" width="416" height="416" style="background-color: grey">
+        <img class="col-6 m-4" id="image" src="data:image/jpeg;base64, {{ image }}" width="416" height="416">
         <h3 class="col-6">
             <small class="text-muted">예측 결과 : </small>
             {{predict}}
         </h3>
     </div>
-
-
     {% endif %}
-    {% if filename is not none %}
-    <div class="row justify-content-center">
-        {{filename}}
-        <video controls="" autoplay="" name="media">
-            <source src="{{ url_for('static', filename=filename) }}" type="video/mp4">
-        </video>
-    </div>
-    {% endif %}
+
+    <!--{% if filename is not none %}-->
+    <!--<div class="row justify-content-center">-->
+    <!--    {{filename}}-->
+    <!--    <video controls="" autoplay="" name="media">-->
+    <!--        <source src="{{ url_for('static', filename=filename) }}" type="video/mp4">-->
+    <!--    </video>-->
+    <!--</div>-->
+    <!--{% endif %}-->
 
 
 <!--<div class="upload-container", align="center">-->
@@ -71,6 +69,3 @@
 
 
 {% endblock %}
-
-
-

@@ -1,6 +1,4 @@
 {% extends 'base_list.html' %}
-
-
 {% block content %}
 
 <head><meta http-equiv="refresh" content="3"></head>
@@ -11,28 +9,27 @@
         <th scope="col">시간</th>
         <th scope="col">객체</th>
         <th scope="col">현황</th>
-        <th scope="col">장비</th>
+        <th scope="col">출처</th>
+        <th scope="col">파일명</th>
         <th scope="col">비고</th>
     </tr>
     </thead>
 
     <tbody>
-    {% for t in times %}
+    {% for t in data %}
     <tr>
         <td>{{ t.update_time }}</td>
         <td>{{ t.class }}</td>
         <td>{{ t.count }}</td>
         <td>{{ t.input }}</td>
-        {% set date = t.update_time[0:3] + "_" + t.update_time[3:4] + "_" + t.update_time[4:5]  %}
-        {% set filename = date + ".jpg" %}
-        <td><p1><a class="btn btn-secondary" href="{{url_for('static', filename=t.filename)}}" download="t.filename.jpg">캡쳐화면</a></p1></td>
+        <td>{{ t.filename }}</td>
+        {% set img_path = "../../secret/output/" + (t.filename|string) %}
+        <td><p1><a class="btn btn-secondary" href={{img_path}} download={{t.filename}} >캡쳐 화면</a></p1></td>
     </tr>
     {% endfor %}
 
     </tbody>
 
 </table>
-
-
 
 {% endblock %}
