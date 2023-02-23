@@ -1,30 +1,54 @@
-{% extends 'base.html' %}
+{% extends 'base_pop.html' %}
+
 {% block content %}
 
 <!--<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-cpu-fill" viewBox="0 0 16 16">-->
 <!--  <symbol id="realtime" viewBox="0 0 24 24">-->
 <!--  <path d="M6.5 6a.5.5 0 0 0-.5.5v3a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 0 0-.5-.5h-3z"/>-->
 <!--  <path d="M5.5.5a.5.5 0 0 0-1 0V2A2.5 2.5 0 0 0 2 4.5H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2v1H.5a.5.5 0 0 0 0 1H2A2.5 2.5 0 0 0 4.5 14v1.5a.5.5 0 0 0 1 0V14h1v1.5a.5.5 0 0 0 1 0V14h1v1.5a.5.5 0 0 0 1 0V14h1v1.5a.5.5 0 0 0 1 0V14a2.5 2.5 0 0 0 2.5-2.5h1.5a.5.5 0 0 0 0-1H14v-1h1.5a.5.5 0 0 0 0-1H14v-1h1.5a.5.5 0 0 0 0-1H14v-1h1.5a.5.5 0 0 0 0-1H14A2.5 2.5 0 0 0 11.5 2V.5a.5.5 0 0 0-1 0V2h-1V.5a.5.5 0 0 0-1 0V2h-1V.5a.5.5 0 0 0-1 0V2h-1V.5zm1 4.5h3A1.5 1.5 0 0 1 11 6.5v3A1.5 1.5 0 0 1 9.5 11h-3A1.5 1.5 0 0 1 5 9.5v-3A1.5 1.5 0 0 1 6.5 5z"/>-->
+
 <!--  </symbol>-->
 
 
 <div class="py-3 text-center">
-    <h>고양이 탐지 대시보드</h>
-    <h2>
+    <h2>고양이 탐지 대시보드</h2>
+    <h>
 <!--         <svg class="image" width="1.75em" height="1.75em"><use xlink:href="#realtime"/></svg>-->
-        <strong>실시간 탐지 결과</strong>
-    </h2>
+        <strong>사용자파일 탐지 결과</strong>
+    </h>
 </div>
 
-<div class="upload-container", align="center">
-<!--    <p><a class="btn btn-outline-success" href="http://192.168.0.151:5000/cat_upload">사용자파일 이미지분류 업로드 &raquo;</a></p>-->
-    <p><a class="btn btn-outline-success" href="{{url_for('detect_upload')}}">이미지 분류 사용자파일 업로드 &raquo;</a></p>
+<div class="row justify-content-center", align = "center">
+        <form class="col-4 p-md-5 mt-4 border rounded-3 bg-light" enctype=multipart/form-data action="{{ url_for('file_upload') }}" method="post">
+            <div class="mb-3">
+                <label for="upImage" class="form-label">사용자 파일 업로드</label>
+                <p></p>
+                <input type=file id=upImage name=file>
+            </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
 </div>
 
 
-<div class="video-container", align="center">
-    <img src="{{ url_for('webcam') }}">
-</div>
+    {% if image is not none %}
+    <div class="row justify-content-center">
+        <img class="col-6 m-4" id="image" src="data:image/jpeg;base64,{{ image }}" width="416" height="416" style="background-color: grey">
+        <h3 class="col-6">
+            <small class="text-muted">예측 결과 : </small>
+            {{predict}}
+        </h3>
+    </div>
+
+
+    {% endif %}
+    {% if filename is not none %}
+    <div class="row justify-content-center">
+        {{filename}}
+        <video controls="" autoplay="" name="media">
+            <source src="{{ url_for('static', filename=filename) }}" type="video/mp4">
+        </video>
+    </div>
+    {% endif %}
 
 
 <!--<div class="upload-container", align="center">-->
@@ -46,5 +70,7 @@
 </div>
 
 
-
 {% endblock %}
+
+
+
