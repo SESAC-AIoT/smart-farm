@@ -4,7 +4,7 @@ from firebase_admin import firestore
 from datetime import datetime
 
 # Use a service account.
-cred = credentials.Certificate('../../secret/nugunaaiot-maeng-1004a11a5af7.json')
+cred = credentials.Certificate('./static/secret/nugunaaiot-maeng-1004a11a5af7.json')
 app = firebase_admin.initialize_app(cred)
 db = firestore.client()
 

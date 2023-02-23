@@ -177,7 +177,7 @@ def upload_detect(results, input, filename=None):
 
 
 def file_save(img, filename): # 탐지완료 파일 백업용
-    img_path = "./static/" + filename
+    img_path = "./static/secret/output/" + filename
     cv2.imwrite(img_path, img)
 
 ############### 사용자파일 객체탐지관련 웹페이지 및 함수 #################
@@ -202,10 +202,13 @@ def file_upload():
 
             # pred = predict_image(img) # 분류 예측
             pred = model(img, size=640)
+            # print(str(pred))
+            # print(str(pred).split())
             upload_detect(pred, input='userfile', filename=filename)
             
             # 웹에서 디스플레이 되도록 인코딩
-            ret, buf = cv2.imencode('.jpeg', img)
+            img = np.squeeze(pred.render())  # RGB
+            ret, buf = cv2.imencode('.jpg', img)
             b64_img = base64.b64encode(buf).decode('utf-8')
             return render_template('detect_upload.html', image = b64_img ,predict=str(pred)[19:26], filename=None)
 
@@ -213,6 +216,7 @@ def file_upload():
             return 'You forgot Snap!'
 
     return '빈페이지'
+
 
 ########################     실행     ########################
 if __name__ == '__main__':
@@ -223,7 +227,7 @@ if __name__ == '__main__':
     create_device(collection, d_id)
 
     # 객체탐지 모델 로드
-    model_path = '../../secret/model/yolov5/models/yolov5s.pt'
+    model_path = './static/secret/model/yolov5/models/yolov5s.pt'
     model = torch.hub.load('ultralytics/yolov5', model='custom', path=model_path)  # backend에서 cuda 자동 설정
 
 
