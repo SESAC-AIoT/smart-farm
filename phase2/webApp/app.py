@@ -1,13 +1,9 @@
-from flask import Flask, make_response, request, render_template, session, Response, send_file
+from flask import Flask, request, render_template, session, Response
 from database import *
 import numpy as np
 from datetime import datetime, timedelta
-import io, cv2, torch
+import io, cv2, torch, base64
 from PIL import Image
-
-from animalcnn import predict_image, predict_batch
-import tempfile, base64
-from pathlib import Path
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'aiot'
@@ -123,21 +119,11 @@ def get_chart(device, type):
 # 탐지 대시보드 웹페이지
 @app.route("/detect", methods=['POST', 'GET'])
 def detect():
-    # if 'd' not in session:
-    #     session['d'] = get_device(collection, d_id)
-    # device = session['d']
-    # all_list = device['detect'][-20:]
-    # all_list.reverse()
-    # results = [all for all in all_list]
-    # return render_template('detect.html', times = results)
     return render_template('detect.html')
 
 # 객체탐지 테이블 웹페이지
 @app.route("/detect_table", methods=['POST', 'GET'])
 def detect_table():
-    # device = db.collection(collection).document(d_id).get()
-    # session['d'] = device.to_dict()
-    # device = session['d']
     device = get_device(collection, d_id)
     all_list = device['detect'][-20:]
     all_list.reverse()
@@ -161,10 +147,13 @@ def webcam_gen_frame():
             img = Image.open(io.BytesIO(frame))
 
             results = model(img, size=640)
-            upload_detect(str(results), input='webcam')
 
             img = np.squeeze(results.render()) #RGB
             img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR) #BGR
+            filename= datetime.now().strftime("%Y_%m_%d_%H_%M_%S") + ".jpg"
+            upload_detect(results, input='webcam',filename=filename)
+            if 'cat' in str(results):
+                file_save(img_BGR, filename)
         else:
             break
 
@@ -172,18 +161,13 @@ def webcam_gen_frame():
         yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
 # 객체탐지 DB 생성 및 업로드
-def upload_detect(preds, input, filename=None):
+def upload_detect(results, input, filename=None):
     obj = 'cat'
-    if obj in preds:
-        if input == 'webcam':
-            filename = 'realtime.jpg'
-            predict_log = preds[19:26]
-        elif input == 'userfile':
-            predict_log = 99  # 분류의 경우 positive
-
+    results = str(results)
+    if obj in results:
         detect_data = {'update_time': datetime.now().strftime("%Y.%m.%d %H:%M:%S"),
                        'class': obj,
-                       'count': predict_log,
+                       'count': results[19:26],
                        'input': input,
                        'filename': filename
                        }
@@ -191,8 +175,9 @@ def upload_detect(preds, input, filename=None):
         doc_ref = db.collection(collection).document(d_id)
         doc_ref.update({'detect': firestore.ArrayUnion([detect_data])})
 
+
 def file_save(img, filename): # 탐지완료 파일 백업용
-    img_path = "../../secret/output/" + filename
+    img_path = "./static/" + filename
     cv2.imwrite(img_path, img)
 
 ############### 사용자파일 객체탐지관련 웹페이지 및 함수 #################
@@ -215,13 +200,14 @@ def file_upload():
             img = cv2.imdecode(np.frombuffer(fs.read(), np.uint8), cv2.IMREAD_UNCHANGED)
             file_save(img, filename)
 
-            pred = predict_image(img) # 분류 예측
+            # pred = predict_image(img) # 분류 예측
+            pred = model(img, size=640)
             upload_detect(pred, input='userfile', filename=filename)
             
             # 웹에서 디스플레이 되도록 인코딩
             ret, buf = cv2.imencode('.jpeg', img)
             b64_img = base64.b64encode(buf).decode('utf-8')
-            return render_template('detect_upload.html', image = b64_img ,predict=pred, filename=None)
+            return render_template('detect_upload.html', image = b64_img ,predict=str(pred)[19:26], filename=None)
 
         else:
             return 'You forgot Snap!'
@@ -239,6 +225,7 @@ if __name__ == '__main__':
     # 객체탐지 모델 로드
     model_path = '../../secret/model/yolov5/models/yolov5s.pt'
     model = torch.hub.load('ultralytics/yolov5', model='custom', path=model_path)  # backend에서 cuda 자동 설정
+
 
     # 웹앱 실행
     app.run('0.0.0.0', debug=True, use_reloader=False)

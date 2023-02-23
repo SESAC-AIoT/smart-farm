@@ -1,4 +1,4 @@
-{% extends 'base_list.html' %}
+{% extends 'base_table.html' %}
 {% block content %}
 
 <head><meta http-equiv="refresh" content="3"></head>
@@ -25,6 +25,7 @@
         <td>{{ t.filename }}</td>
         {% set img_path = "../../secret/output/" + (t.filename|string) %}
         <td><p1><a class="btn btn-secondary" href={{img_path}} download={{t.filename}} >캡쳐 화면</a></p1></td>
+<!--        <td><p1><a class="btn btn-secondary" href={{url_for('static', filename=t.filename)}} download={{t.filename}} >캡쳐 화면</a></p1></td>-->
     </tr>
     {% endfor %}
 
