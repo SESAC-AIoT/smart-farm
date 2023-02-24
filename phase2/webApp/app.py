@@ -180,6 +180,8 @@ def file_save(pred, img, filename): # 탐지완료 파일 백업용
     if detect_obj in str(pred):
         img_path = "./static/secret/output/" + filename
         cv2.imwrite(img_path, img)
+        # 스토리지 업로드를 위한 함수 호출
+        upload_file(filename)
 
 ############### 사용자파일 객체탐지관련 웹페이지 및 함수 #################
 
@@ -225,7 +227,6 @@ def file_upload():
 
 ########################     실행     ########################
 if __name__ == '__main__':
-
 
     # 데이터 베이스 연동
     collection = 'catFarm'  # device
