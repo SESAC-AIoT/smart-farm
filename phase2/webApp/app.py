@@ -18,10 +18,6 @@ def before_request():
 def index():
     return render_template('index.html')
 
-@app.route("/register", methods=['POST', 'GET'])
-def register():
-    return render_template('sregister.html')
-
 @app.teardown_request
 def shutdown_session(exception=None):
     pass
@@ -117,9 +113,9 @@ def get_chart(device, type):
 ############### 웹캠 객체탐지관련 웹페이지 및 함수#################
 
 # 탐지 대시보드 웹페이지
-@app.route("/detect", methods=['POST', 'GET'])
-def detect():
-    return render_template('detect.html')
+@app.route("/detect_webcam", methods=['POST', 'GET'])
+def detect_webcam():
+    return render_template('detect_webcam.html')
 
 # 객체탐지 테이블 웹페이지
 @app.route("/detect_table", methods=['POST', 'GET'])
@@ -189,9 +185,9 @@ def file_save(pred, img, filename): # 탐지완료 파일 백업용
 ############### 사용자파일 객체탐지관련 웹페이지 및 함수 #################
 
 # 사용자파일 객체탐지 웹앱 생성
-@app.route("/detect_upload", methods=['POST', 'GET'])
-def detect_upload():
-    return render_template('detect_upload.html', image=None, filename=None)
+@app.route("/detect_userfile", methods=['POST', 'GET'])
+def detect_userfile():
+    return render_template('detect_userfile.html', image=None, filename=None)
 
 
 # 사용자파일 객체탐지 웹앱 내 업로드 기능 생성_결과DB적재 및 이미지파일 저장
@@ -220,7 +216,7 @@ def file_upload():
             file_save(pred, img, filename)
             b64_img = base64.b64encode(buf).decode('utf-8')
 
-            return render_template('detect_upload.html', image = b64_img , filename=None)
+            return render_template('detect_userfile.html', image = b64_img , filename=None)
 
         else:
             return 'You forgot Snap!'
