@@ -34,8 +34,12 @@ def gen_run(d_id, upload_num):
     }
     detect = {
         'update_time': datetime.now().strftime("%Y.%m.%d %H:%M:%S"),
-        'result' : str(randint(1, 5)) + ' cat'
+        'class': 'cat',
+        'count': randint(1,10),
+        'input': 'fake',
+        'filename': 'fake.jpg',
     }
+
     model = {
         'update_time': datetime.now().strftime("%Y.%m.%d %H:%M:%S"),
         'growth_level': random.choice(['0', '1', '2', '3'])

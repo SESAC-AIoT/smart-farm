@@ -173,7 +173,6 @@ def upload_detect(pred, input, filename=None):
 # 객체 탐지 갯수 리턴
 def pred_preprocessing(pred) :
     pred_pd = pred.pandas().xyxy[0]
-    print(pred_pd)
     obj_count = sum(pred_pd['name'] == detect_obj) # true length
     return obj_count
 
@@ -226,6 +225,7 @@ def file_upload():
 
 ########################     실행     ########################
 if __name__ == '__main__':
+
 
     # 데이터 베이스 연동
     collection = 'catFarm'  # device
