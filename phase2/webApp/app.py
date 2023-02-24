@@ -8,25 +8,26 @@ from PIL import Image
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'aiot'
 
-@app.before_request
-def before_request():
-    session.permanent = True
-    app.permanent_session_lifetime = timedelta(minutes=5)
-    session.modified = True
+# @app.before_request
+# def before_request():
+#     session.permanent = True
+#     app.permanent_session_lifetime = timedelta(minutes=5)
+#     session.modified = True
+
+# @app.teardown_request
+# def shutdown_session(exception=None):
+#     pass
 
 @app.route("/", methods=['POST', 'GET'])
 def index():
-    return render_template('index.html')
+    return render_template('index.html', login_status=login_status, product_name=collection, product_id = d_id)
 
-@app.teardown_request
-def shutdown_session(exception=None):
-    pass
 
 ##### login ####
 @app.route("/login", methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
-        global login_status
+        global login_status, collection, d_id
         collection = request.form['name']
         d_id = request.form['d_id']
         if get_device(collection, d_id) is False:
@@ -270,9 +271,6 @@ def file_upload():
 
     return '빈페이지'
 
-
-
-
 ########################     실행     ########################
 if __name__ == '__main__':
 
@@ -280,16 +278,21 @@ if __name__ == '__main__':
     login_status = False
     alert = False
 
+
     # 데이터 베이스 연동
-    collection = 'catFarm'  # device
-    d_id = datetime.now().strftime("%Y.%m.%d")
-    create_device(collection, d_id)
+
+    # collection = 'catFarm'  # device
+    # d_id = datetime.now().strftime("%Y.%m.%d")
+    # create_device(collection, d_id)
+    collection = False
+    d_id = False
 
     # 객체탐지 모델 로드
     detect_obj = 'cat'
-    model_path = './static/secret/model/yolov5/models/yolov5s.pt'
+    model_path = './static/secret/model/yolov5/models/yolov5l.pt'
     model = torch.hub.load('ultralytics/yolov5', model='custom', path=model_path)  # backend에서 cuda 자동 설정
-
+    # model = torch.hub.load('ultralytics/yolov5', 'yolov5l'
+    model.conf = 0.6
 
     # 웹앱 실행
     app.run('0.0.0.0', debug=True, use_reloader=False)

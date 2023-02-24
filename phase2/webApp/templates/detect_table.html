@@ -23,8 +23,9 @@
         <td>{{ t.input }}</td>
         <td>{{ t.filename }}</td>
         {% set img_path = "./static/secret/output/" + (t.filename|string) %}
-        {% set img_path_url = "https://firebasestorage.googleapis.com/v0/b/nugunaaiot-maeng.appspot.com/o/" + (t.filename|string) + "?alt=media" %}
-        <td><p1><a class="btn btn-secondary" href={{img_path_url}} download={{t.filename}} >캡쳐 화면</a></p1></td>
+<!--        {% set img_path_url = "https://firebasestorage.googleapis.com/v0/b/nugunaaiot-maeng.appspot.com/o/" + (t.filename|string) + "?alt=media" %}-->
+        {% set img_path_url = "https://firebasestorage.googleapis.com/v0/b/nugunaaiot-maeng.appspot.com/o/" + (t.filename|string)%}
+        <td><p1><a class="btn btn-secondary" href={{img_path_url}} download={{t.filename}} >캡처 파일</a></p1></td>
     </tr>
     {% endfor %}
 
