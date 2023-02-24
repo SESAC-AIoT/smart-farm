@@ -17,6 +17,8 @@ def get_device(collection, d_id):
     device = db.collection(collection).document(d_id).get()
     if device.exists:
         return device.to_dict()
+    else:
+        return False
 
 def create_device(collection, d_id):
     doc_ref = db.collection(collection).document(d_id)

@@ -22,23 +22,53 @@ def index():
 def shutdown_session(exception=None):
     pass
 
+##### login ####
+@app.route("/login", methods=['POST', 'GET'])
+def login():
+    if request.method == 'POST':
+        global login_status
+        collection = request.form['name']
+        d_id = request.form['d_id']
+        if get_device(collection, d_id) is False:
+            return render_template('login.html', alert=True)
+        else:
+            login_status = True
+            return render_template('index.html', login_status=login_status, product_name=collection, product_id = d_id)
+    return render_template('login.html')
+
+@app.route('/logout', methods=['POST', 'GET'])
+def logout():
+    global login_status
+    login_status = False
+    collection = False
+    d_id = False
+    # session.pop('logged_in', None)
+    return render_template('index.html', login_status=login_status, product_name=collection, product_id = d_id)
+
+
 ############### 센서데이터 모니터링/대시보드 페이지 #################
 
 @app.route("/monitor/", methods=['POST', 'GET'])
 def monitor():
-    # 화면 리프레시 할 때 데이터 새로 고침을 위해 세션 미사용
-    device = get_device(collection, d_id)
-    m = get_monitor(device['sensor'][-1])
-    g = get_growth((device['model'][-1]))
-    return render_template('monitor.html', m = m, growth = g)
+    if login_status :
+        # 화면 리프레시 할 때 데이터 새로 고침을 위해 세션 미사용
+        device = get_device(collection, d_id)
+        m = get_monitor(device['sensor'][-1])
+        g = get_growth((device['model'][-1]))
+        return render_template('monitor.html', m = m, growth = g, login_status=login_status, product_name=collection, product_id = d_id)
+    else:
+        return render_template('login.html')
 
 @app.route("/board/<type>", methods=['POST', 'GET'])
 def board(type):
-    # 화면 리프레시 할 때 데이터 새로 고침을 위해 세션 미사용
-    device = get_device(collection, d_id)
-    sensors, times = get_board(device)
-    values = get_chart(device, type)
-    return render_template('board.html', sensors = sensors , times = times, values = values)
+    if login_status :
+        # 화면 리프레시 할 때 데이터 새로 고침을 위해 세션 미사용
+        device = get_device(collection, d_id)
+        sensors, times = get_board(device)
+        values = get_chart(device, type)
+        return render_template('board.html', sensors = sensors , times = times, values = values, login_status=login_status, product_name=collection, product_id = d_id)
+    else:
+        return render_template('login.html')
 
 def get_growth(growth):
     if growth['growth_level'] == '0':
@@ -117,6 +147,8 @@ def get_chart(device, type):
 def detect_webcam():
     return render_template('detect_webcam.html')
 
+
+
 # 객체탐지 테이블 웹페이지
 @app.route("/detect_table", methods=['POST', 'GET'])
 def detect_table():
@@ -131,6 +163,7 @@ def detect_table():
 def webcam():
     return Response(webcam_gen_frame(),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
+
 
 # 웹캠 opencv 실행 및 yolo 탐지
 def webcam_gen_frame():
@@ -194,7 +227,10 @@ def file_save(pred, img, filename): # 탐지완료 파일 백업용
 # 사용자파일 객체탐지 웹앱 생성
 @app.route("/detect_userfile", methods=['PgitOST', 'GET'])
 def detect_userfile():
-    return render_template('detect_userfile.html', image=None, filename=None)
+    if login_status:
+        return render_template('detect_userfile.html', image=None, filename=None, login_status=login_status, product_name=collection, product_id = d_id)
+    else:
+        return render_template('login.html')
 
 
 
@@ -235,8 +271,14 @@ def file_upload():
     return '빈페이지'
 
 
+
+
 ########################     실행     ########################
 if __name__ == '__main__':
+
+    # fake session
+    login_status = False
+    alert = False
 
     # 데이터 베이스 연동
     collection = 'catFarm'  # device
