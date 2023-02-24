@@ -25,19 +25,20 @@ def upload_data(d_id, sensor, detect, model, upload_num):
 def gen_run(d_id, upload_num):
     sensor = {
         'update_time' : datetime.now().strftime("%Y.%m.%d %H:%M:%S"),
-        'fan' : str(random.choice([1,1,1,0,0])),
-        'wl' : str(random.choice([1, 0, 1, 1, 0])),  # 수위 센서, 5개중 하나 선택
+        'fan' : str(random.choice([1,1,1,0,0]) ),
+        'wl' : str(random.choice([1, 0, 1, 1, 0]) ),  # 수위 센서, 5개중 하나 선택
         'ph' : round(uniform(5, 8),1),  # ph센서
         'tb' : round(uniform(4, 8),1),  # 탁도 센서
         'tp' : round(uniform(15, 30),1),  # 온도 센서
         'hd' : round(uniform(40, 70),1)  # 습도 센서
     }
+    input = random.choice(['realtime', 'userfile'])
     detect = {
         'update_time': datetime.now().strftime("%Y.%m.%d %H:%M:%S"),
         'class': 'cat',
         'count': randint(1,10),
-        'input': 'fake',
-        'filename': 'fake.jpg',
+        'input': input,
+        'filename':  '_'.join([datetime.now().strftime("%Y_%m_%d_%H_%M_%S"), input, 'fake'])+'.jpg',
     }
 
     model = {
@@ -103,7 +104,8 @@ if __name__ == '__main__':
             print('=' * 50)
             sleep(interval)
 
-        except :
+        except Exception as e:
+            print(e)
             doc_ref = db.collection(collection).document(d_id)
             data = {
                 'is_running': False,
