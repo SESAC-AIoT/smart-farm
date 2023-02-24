@@ -289,10 +289,11 @@ if __name__ == '__main__':
 
     # 객체탐지 모델 로드
     detect_obj = 'cat'
-    model_path = './static/secret/model/yolov5/models/yolov5l.pt'
+    model_path = './static/secret/model/yolov5l.pt'
     model = torch.hub.load('ultralytics/yolov5', model='custom', path=model_path)  # backend에서 cuda 자동 설정
     # model = torch.hub.load('ultralytics/yolov5', 'yolov5l'
     model.conf = 0.6
 
     # 웹앱 실행
-    app.run('0.0.0.0', debug=True, use_reloader=False)
+    # app.run('0.0.0.0', debug=True, use_reloader=False)
+    app.run(debug=True, use_reloader=False)
