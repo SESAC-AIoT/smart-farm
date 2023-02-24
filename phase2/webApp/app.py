@@ -134,6 +134,7 @@ def webcam():
 
 # 웹캠 opencv 실행 및 yolo 탐지
 def webcam_gen_frame():
+    input = 'webcam'
     cam = cv2.VideoCapture(0, cv2.CAP_DSHOW) # 웹캠 opencv 로딩 속도 개선 cap_dshow 다이렉트쇼
     while(cam.isOpened()):
         success, frame = cam.read()
@@ -143,8 +144,9 @@ def webcam_gen_frame():
             img = Image.open(io.BytesIO(frame))
 
             pred = model(img, size=640)
-            filename = datetime.now().strftime("%Y_%m_%d_%H_%M_%S") + ".jpg"
+
             # preprocessing & upload
+            filename = file_naming(input, filename='realtime')
             upload_detect(pred, input='webcam', filename=filename)
 
             img = np.squeeze(pred.render())  # RGB
@@ -176,6 +178,10 @@ def pred_preprocessing(pred) :
     obj_count = sum(pred_pd['name'] == detect_obj) # true length
     return obj_count
 
+def file_naming(input, filename=None):
+    filename = '_'.join([datetime.now().strftime("%Y_%m_%d_%H_%M_%S"), input, filename])+'.jpg'
+    return filename
+
 def file_save(pred, img, filename): # 탐지완료 파일 백업용
     if detect_obj in str(pred):
         img_path = "./static/secret/output/" + filename
@@ -191,9 +197,12 @@ def detect_userfile():
     return render_template('detect_userfile.html', image=None, filename=None)
 
 
+
+
 # 사용자파일 객체탐지 웹앱 내 업로드 기능 생성_결과DB적재 및 이미지파일 저장
 @app.route('/file_upload', methods=['GET', 'POST'])
 def file_upload():
+    input = 'userfile'
     if request.method == 'POST':
         if 'file' not in request.files:
             return 'You forgot Snap!'
@@ -207,7 +216,8 @@ def file_upload():
             pred = model(img, size=640)
 
             # preprocessing & upload
-            upload_detect(pred, input='userfile', filename=filename)
+            filename = file_naming(input, filename.split('.')[0])
+            upload_detect(pred, input=input, filename=filename)
 
             file_save(pred, img, filename)
 

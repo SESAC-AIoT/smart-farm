@@ -23,11 +23,11 @@
 <div class="row justify-content-center", align = "center">
         <form class="col-4 p-md-5 mt-4 border rounded-3 bg-light" enctype=multipart/form-data action="{{ url_for('file_upload') }}" method="post">
             <div class="mb-3">
-                <label for="upImage" class="form-label">사용자 파일 업로드</label>
+                <label for="upImage" class="form-label">사용자 파일 업로드(jpg only)</label>
                 <p></p>
                 <input type=file id=upImage name=file>
             </div>
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="btn btn-primary">분석하기</button>
         </form>
 </div>
 
