@@ -184,7 +184,7 @@ def file_save(pred, img, filename): # 탐지완료 파일 백업용
 ############### 사용자파일 객체탐지관련 웹페이지 및 함수 #################
 
 # 사용자파일 객체탐지 웹앱 생성
-@app.route("/detect_userfile", methods=['POST', 'GET'])
+@app.route("/detect_userfile", methods=['PgitOST', 'GET'])
 def detect_userfile():
     return render_template('detect_userfile.html', image=None, filename=None)
 
