@@ -146,39 +146,45 @@ def webcam_gen_frame():
             frame=buffer.tobytes()
             img = Image.open(io.BytesIO(frame))
 
-            results = model(img, size=640)
+            pred = model(img, size=640)
+            filename = datetime.now().strftime("%Y_%m_%d_%H_%M_%S") + ".jpg"
+            # preprocessing & upload
+            upload_detect(pred, input='webcam', filename=filename)
 
-            img = np.squeeze(results.render()) #RGB
-            img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR) #BGR
-            filename= datetime.now().strftime("%Y_%m_%d_%H_%M_%S") + ".jpg"
-            upload_detect(results, input='webcam',filename=filename)
-            if 'cat' in str(results):
-                file_save(img_BGR, filename)
+            img = np.squeeze(pred.render())  # RGB
+            img_BGR = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+            file_save(pred, img_BGR, filename)
+
         else:
             break
 
         frame = cv2.imencode('.jpg', img_BGR)[1].tobytes()
         yield(b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
-# 객체탐지 DB 생성 및 업로드
-def upload_detect(results, input, filename=None):
-    obj = 'cat'
-    results = str(results)
-    if obj in results:
+# 객체탐지 DB 생성/업로드
+def upload_detect(pred, input, filename=None):
+    obj_count = pred_preprocessing(pred)
+    if obj_count > 0:
         detect_data = {'update_time': datetime.now().strftime("%Y.%m.%d %H:%M:%S"),
-                       'class': obj,
-                       'count': results[19:26],
+                       'class': detect_obj,
+                       'count': obj_count,
                        'input': input,
                        'filename': filename
                        }
-
         doc_ref = db.collection(collection).document(d_id)
         doc_ref.update({'detect': firestore.ArrayUnion([detect_data])})
 
+# 객체 탐지 갯수 리턴
+def pred_preprocessing(pred) :
+    pred_pd = pred.pandas().xyxy[0]
+    print(pred_pd)
+    obj_count = sum(pred_pd['name'] == detect_obj) # true length
+    return obj_count
 
-def file_save(img, filename): # 탐지완료 파일 백업용
-    img_path = "./static/secret/output/" + filename
-    cv2.imwrite(img_path, img)
+def file_save(pred, img, filename): # 탐지완료 파일 백업용
+    if detect_obj in str(pred):
+        img_path = "./static/secret/output/" + filename
+        cv2.imwrite(img_path, img)
 
 ############### 사용자파일 객체탐지관련 웹페이지 및 함수 #################
 
@@ -186,6 +192,7 @@ def file_save(img, filename): # 탐지완료 파일 백업용
 @app.route("/detect_upload", methods=['POST', 'GET'])
 def detect_upload():
     return render_template('detect_upload.html', image=None, filename=None)
+
 
 # 사용자파일 객체탐지 웹앱 내 업로드 기능 생성_결과DB적재 및 이미지파일 저장
 @app.route('/file_upload', methods=['GET', 'POST'])
@@ -198,19 +205,22 @@ def file_upload():
 
         if 'jpg' in filename:
             img = cv2.imdecode(np.frombuffer(fs.read(), np.uint8), cv2.IMREAD_UNCHANGED)
-            file_save(img, filename)
 
-            # pred = predict_image(img) # 분류 예측
+            # 예측결과 업로드
             pred = model(img, size=640)
-            # print(str(pred))
-            # print(str(pred).split())
+
+            # preprocessing & upload
             upload_detect(pred, input='userfile', filename=filename)
-            
+
+            file_save(pred, img, filename)
+
             # 웹에서 디스플레이 되도록 인코딩
             img = np.squeeze(pred.render())  # RGB
             ret, buf = cv2.imencode('.jpg', img)
+            file_save(pred, img, filename)
             b64_img = base64.b64encode(buf).decode('utf-8')
-            return render_template('detect_upload.html', image = b64_img ,predict=str(pred)[19:26], filename=None)
+
+            return render_template('detect_upload.html', image = b64_img , filename=None)
 
         else:
             return 'You forgot Snap!'
@@ -227,6 +237,7 @@ if __name__ == '__main__':
     create_device(collection, d_id)
 
     # 객체탐지 모델 로드
+    detect_obj = 'cat'
     model_path = './static/secret/model/yolov5/models/yolov5s.pt'
     model = torch.hub.load('ultralytics/yolov5', model='custom', path=model_path)  # backend에서 cuda 자동 설정
 
