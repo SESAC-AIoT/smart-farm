@@ -4,10 +4,10 @@
 * FarmBoys (맹광국, 송명근, 박태현/송애경)
 
 ### 🎈 Project Schedule
-1. 준비(2/06~2/10) : 매일 1시간 주제 아이데이션
-2. 1주차(2/13~2/15) : 주제 확정 및 피처 선정, RnR, 개발환경 구성, 기술 사전 조사, 문서화(기획/WBS), 2/15 기획 발표(킥오프), 2/16~17 개발 시작
-3. 2주차(2/20~2/24) : 20일 중간 통합, 21~23 기능 추가, 24 통합 서비스 배포
-4. 발표(2/27~28) : 27일 문서화/정리, 28일 발표
+1. 준비(2/06-2/10) : 매일 1시간 주제 아이데이션
+2. 1주차(2/13-2/15) : 주제 확정 및 피처 선정, RnR, 개발환경 구성, 기술 사전 조사, 문서화(기획/WBS), 2/15 기획 발표(킥오프), 2/16-17 개발 시작
+3. 2주차(2/20-2/24) : 20일 중간 통합, 21~23 기능 추가, 24 통합 서비스 배포
+4. 발표(2/27-28) : 27일 문서화/정리, 28일 발표
 
 ### 🎈 Project Goal
 1. 공부 내용이 최대한 활용/반영된 서비스 포트폴리오 만들기
@@ -20,6 +20,7 @@
 
 ### 🎈 Project Management & Collaboration Tool 
 * Agile + Waterfall Hybrid, Daily Scrum
+<img width="401" alt="Agile+Waterfall Hybrid" src="https://user-images.githubusercontent.com/79052421/221502124-c2011b62-8c21-42ad-91f8-535b8e6d901d.png">
 * Messenger(Slack), Code(Github Organization)
 * Task(Github Projects), Issue(Github Issues), Documentation(Notion/Google)
  
@@ -27,11 +28,13 @@
 * Cat grass AIoT Smart Farm (Cat Farm)
 * 요약 : 반려묘 가정 필수 식물인 캣그라스를 잘 키울 수 있도록 생육 환경(온습도 등)을 관리하고 모니터링할 수 있는 AIoT 웹 서비스
 * 캣그라스 란? 귀리, 밀, 보리 호밀 등 고양이가 먹어도 안전한 풀로서 고양이 건강(헤어볼/배변 배출, 미네랄/비타민 섭취)관리 목적으로 키움
+<img width="538" alt="image" src="https://user-images.githubusercontent.com/79052421/221502262-f33ff0ab-990f-41d5-b99c-340976f07760.png">
 
 ### 2. Problem(Pain Point/Needs)
 * 똥손 집사라서 미안해
 * 비교적 키우기 쉬운 식물에 속하지만 식물 똥손에게 난이도는 무관하다.
 * 온습도를 맞추기 못해 곰팡이가 슬고 겨울철엔 성장에 더욱 더디다.
+<img width="408" alt="image" src="https://user-images.githubusercontent.com/79052421/221502317-fcc28cd9-3a9e-4992-81d4-30a054265633.png">
 
 ### 3. Solution Ideation
 * 똥손 집사를 위한 “캣그라스”전용 가정용 스마트팜
@@ -41,8 +44,10 @@
 1. 생육 환경 센서 수집 및 디바이스 컨트롤
 2. 고양이 탐지 알림 및 로그 대시보드
 3. 센서 데이터 관제 대시보드
+<img width="326" alt="image" src="https://user-images.githubusercontent.com/79052421/221504330-6076b263-ce1f-464f-bd78-a78b665f20f4.png">
 
 ### 5. Service Architecture
+<img width="326" alt="image" src="https://user-images.githubusercontent.com/79052421/221504330-6076b263-ce1f-464f-bd78-a78b665f20f4.png">
 
 ### 6. Developement Framework
 * Language : Python
