@@ -60,12 +60,12 @@
 ### 7. Device/Sensor List
 1) Base / Board : [Converea(교육용 스마트팜)](https://youtu.be/L2TvesXuN0w)
 <img width="491" alt="image" src="https://user-images.githubusercontent.com/79052421/221507315-73264cbf-c0c5-40f7-af6c-f21076f0b7c5.png">
-3) Edge Computing : Jetson Nano 4G, Raspberry pi 4
+2) Edge Computing : Jetson Nano 4G, Raspberry pi 4
 <img width="513" alt="image" src="https://user-images.githubusercontent.com/79052421/221507027-de5e7211-4800-4e49-a1a6-ec4313218770.png">
 <img width="481" alt="image" src="https://user-images.githubusercontent.com/79052421/221506752-65a9cff0-460e-42c9-a62a-f7756c7cbcde.png">
-5) Actuator : 수중펌프모터, 환기 팬
-6) Sensor : 온습도센서, 수온센서, 비접촉 수위센서, PH센서, 탁도센서
-7) Web cam
+3) Actuator : 수중펌프모터, 환기 팬
+4) Sensor : 온습도센서, 수온센서, 비접촉 수위센서, PH센서, 탁도센서
+5) Web cam
 
 ### 8. WBS
 <img width="719" alt="image" src="https://user-images.githubusercontent.com/79052421/221506515-cbbef6af-ce66-4666-8c45-60edd3a637fd.png">
