@@ -264,7 +264,7 @@ def file_upload():
             file_save(pred, img, filename)
             b64_img = base64.b64encode(buf).decode('utf-8')
 
-            return render_template('detect_userfile.html', image = b64_img , filename=None)
+            return render_template('detect_userfile.html', image = b64_img , filename=None, login_status=login_status, product_name=collection, product_id = d_id)
 
         else:
             return 'You forgot Snap!'
