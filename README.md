@@ -49,7 +49,7 @@
 ### 5. Service Architecture
 <img width="326" alt="image" src="https://user-images.githubusercontent.com/79052421/221504330-6076b263-ce1f-464f-bd78-a78b665f20f4.png">
 
-### 6. Developement Framework (requirements.txt 참고)
+### 6. Developement Framework
 * Language : Python 3.10.9
 * IDE : Pycharm, Cobal, Jupyter notebook
 * OS : Linux(Ubuntu server), Windows11(Local PC)
@@ -73,19 +73,22 @@
 7) Web cam
 
 ### 8. WBS
-<img width="719" alt="image" src="https://user-images.githubusercontent.com/79052421/221506515-cbbef6af-ce66-4666-8c45-60edd3a637fd.png">
+<img width="719" alt="image" src="https://user-images.githubusercontent.com/79052421/221512121-2f1b9a04-bb84-4459-b638-51439b7debc4.png">
 
 ### 9. Directory Description
 * device
-ㄴ jetsonNano_0.6v.py : 식물 성장 분류 모델 예측 및 파베 업로드 코드
-ㄴ raspBerryPi_0.6v.py : 컨버리아 센서데이터 수집/가공 및 파베 업로드 코드
+  - jetsonNano_0.6v.py : 식물 성장 분류 모델 예측 및 파베 업로드 코드
+  - raspBerryPi_0.6v.py : 컨버리아 센서데이터 수집/가공 및 파베 업로드 코드
+
 * webApp
-ㄴ static
-    ㄴ CSS/
-    ㄴ secret/ : 모델/인증키/아웃풋 (git ignore)
-    ㄴ src files
-ㄴ templates : web page
-ㄴ app.py : flask 웹서버 어플리케이션 코드
-ㄴ database.py : 파이어베이스 접속/인증/생성 코드
-ㄴ fake_data_gen.py : aiot 디바이스 없을 때 대비, 가짜 센서 데이터 제너레이터
+  - static
+    - CSS/
+    - secret/ : 모델/인증키/아웃풋 (git ignore)
+    - src files 
+  - templates : web page
+  - app.py : flask 웹서버 어플리케이션 코드
+  - database.py : 파이어베이스 접속/인증/생성 코드
+  - fake_data_gen.py : aiot 디바이스 없을 때 대비, 가짜 센서 데이터 제너레이터
+
 * venv : 가상 환경(git ignore)
+  - requirements.txt 참고
