@@ -146,7 +146,7 @@ def get_chart(device, type):
 # 탐지 대시보드 웹페이지
 @app.route("/detect_webcam", methods=['POST', 'GET'])
 def detect_webcam():
-    return render_template('detect_webcam.html')
+    return render_template('detect_webcam.html', login_status=login_status, product_name=collection, product_id = d_id)
 
 
 
