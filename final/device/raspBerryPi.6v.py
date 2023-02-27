@@ -88,33 +88,38 @@ def turbidity_read(channel):
 
 def avg_sensor(sensors):
     s_len = len(sensors)
-    sd = {'water_level': 0,
+    
+    sd = {'wl': 0,
           'ph': 0,
-          'turbidity': 0,
-          'temp': 0,
-          'humidity': 0,
-          'update_time' : 0}
+          'tb': 0,
+          'tp': 0,
+          'hd': 0,
+          'update_time' : 0,
+          'fan' : 0}
     
     for s in sensors:
-        print(s)
-        print(s[0])
-
-        sd['water_level'] += s[0]
+        sd['wl'] += s[0]
         sd['ph'] += s[1]
-        sd['turbidity'] += s[2]
-        sd['temp'] += s[3]
-        sd['humidity'] += s[4]
+        sd['tb'] += s[2]
+        sd['tp'] += s[3]
+        sd['hd'] += s[4]
+        sd['fan'] += s[5]
 
 
-    if sd['water_level'] >= s_len / 2:
-        sd['water_level'] = 1
+    if sd['wl'] >= s_len / 2:
+        sd['wl'] = 1
     else:
-        sd['water_level'] = 0
+        sd['wl'] = 0
+
+    if sd['fan'] >= s_len / 2:
+        sd['fan'] = 1
+    else:
+        sd['fan'] = 0
 
     sd['ph'] = round(sd['ph'] / s_len , 1)
-    sd['turbidity'] = round(sd['turbidity'] / s_len, 1)
-    sd['temp'] = round(sd['temp'] / s_len, 1)
-    sd['humidity'] = round(sd['humidity'] / s_len, 1)
+    sd['tb'] = round(sd['tb'] / s_len, 1)
+    sd['tp'] = round(sd['tp'] / s_len, 1)
+    sd['hd'] = round(sd['hd'] / s_len, 1)
     sd['update_time'] = datetime.now().strftime("%Y.%m.%d %H:%M:%S")
     return sd
 
@@ -122,16 +127,19 @@ def avg_sensor(sensors):
 
 # fan
 fan_ch = 5
+fan_status = 0
 GPIO.setup(fan_ch, GPIO.OUT)
 # sensor input data is GPIO.IN, electric output is GPIO.OUT
 
 def fan(tp):
 
     if tp >= 24.0:
-        GPIO.output(fan_ch, GPIO.LOW) # 
+        GPIO.output(fan_ch, GPIO.LOW) #
+        fan_status = 0
         print('fan off')
     else:
         GPIO.output(fan_ch, GPIO.HIGH)
+        fan_status = 1
         print('fan on')
 
 
@@ -144,7 +152,7 @@ if __name__ == '__main__':
     from firebase_admin import credentials, firestore
     # option
     db_collection = 'converea' # database collection id
-    db_id = '0.3v' # database document id
+    db_id = '0.6v' # database document id
     db_key = 'nugunaaiot-maeng-1004a11a5af7.json'
     # Cloud Database : firestore
     cred = credentials.Certificate(f'../../secret/{db_key}')
@@ -189,14 +197,15 @@ if __name__ == '__main__':
             upt = datetime.now().strftime("%Y.%m.%d %H:%M:%S")
                  
             print('update_time = {}, waterLevel ={}, ph = {}, turbidity= {}, temp = {}, humidity = {}'.format(upt, wl, ph, tb, tp, hd))
-            sensors.append([wl, ph, tb, tp, hd, upt])
+            sensors.append([wl, ph, tb, tp, hd, fan_status, upt])
 
             print(len(sensors))
             
             if len(sensors) >= 10:
                 sensor_data = avg_sensor(sensors)
                 upload_sensor(sensor_data)
-                fan(sensor_data['temp'])
+                
+                fan(sensor_data['tp'])
                 print(sensor_data)
                 print('='*50)
                 sensors = []
