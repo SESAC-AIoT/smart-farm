@@ -44,7 +44,7 @@
 1. 생육 환경 센서 수집 및 디바이스 컨트롤
 2. 고양이 탐지 알림 및 로그 대시보드
 3. 센서 데이터 관제 대시보드
-<img width="326" alt="image" src="https://user-images.githubusercontent.com/79052421/221504330-6076b263-ce1f-464f-bd78-a78b665f20f4.png">
+<img width="297" alt="image" src="https://user-images.githubusercontent.com/79052421/221505082-c76b3fdc-7775-41ba-96cf-7fac07a1da68.png">
 
 ### 5. Service Architecture
 <img width="326" alt="image" src="https://user-images.githubusercontent.com/79052421/221504330-6076b263-ce1f-464f-bd78-a78b665f20f4.png">
