@@ -57,6 +57,7 @@ def did_gen(d_id) :
     last_did = device['upload_date']
     last_num = device['upload_num']
     day1 = relativedelta(days=1)
+    today = datetime.now().strftime("%Y.%m.%d")
 
     # 전송 횟수와 오늘 날짜 비교
     if last_num >= upload_limit and last_did == d_id: # 오늘날짜, 전송횟수 초과
@@ -67,11 +68,17 @@ def did_gen(d_id) :
     elif last_num < upload_limit and last_did == d_id: # 오늘 날짜, 전송횟수 남음
         return last_did, last_num
 
-    else : # 날짜가 매칭되지 않을 경우
+    elif last_did != today :# 날짜가 매칭되지 않을 경우
         upload_num = 0
-        d_id = datetime.now().strftime("%Y.%m.%d")
+        d_id = today
         return d_id, upload_num
+    else : # 위조건에 모두 해당하지 않는 예외 발생시(다른 채널 인풋으로 인한 용량초과?)
+        d_id = (datetime.now() + day1).strftime("%Y.%m.%d")  # 다음날로 도큐먼트 아이디 강제 변경
+        upload_num = 0
+        return d_id, upload_num
+
     return last_did, last_num
+
 
 
 #### 실행 ####
@@ -84,7 +91,6 @@ if __name__ == '__main__':
     create_device(collection, d_id_default)
     d_id, upload_num = did_gen(d_id_default)
 
-
     # GCP firebase firestore free documents write 20,000/day, documents date limit 1mb/document
     # interval 20sec  -> 4,320/day
 
@@ -93,26 +99,34 @@ if __name__ == '__main__':
     # 도큐먼트 삭제 : db.collection(u'cities').document(u'DC').delete()
     while True :
         try:
-            if upload_num >= upload_limit : # 최초 실행 or 전송 횟수 초과시 신규 did 생성
+            if upload_num >= upload_limit:  # 최초 실행 or 전송 횟수 초과시 신규 did 생성
                 d_id, upload_num = did_gen(d_id)
                 create_device(collection, d_id)
 
             sensors = []
             upload_num += 1
-            gen_run(d_id, upload_num)
+            gen_run(d_id, upload_num) # data upload
             print(d_id, upload_num, 'upload success')
             print('=' * 50)
             sleep(interval)
 
         except Exception as e:
             print(e)
-            doc_ref = db.collection(collection).document(d_id)
-            data = {
-                'is_running': False,
-                'upload_date': d_id,
-                'upload_num': upload_num,
-            }
-            doc_ref.update(data)
+            if '400' in str(e):
+                d_id = (datetime.now() + relativedelta(days=1)).strftime("%Y.%m.%d")  # 다음날로 변경
+                upload_num = 0
+                create_device(collection, d_id)
+                print('400error, continue')
+                continue
+            else:
+                print('중지됨')
+                break
+            # doc_ref = db.collection(collection).document(d_id)
+            # data = {
+            #     'is_running': False,
+            #     'upload_date': d_id,
+            #     'upload_num': upload_num,
+            # }
+            # doc_ref.update(data)
 
-            print('중지됨')
-            break
+
